@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Poll Results: {{ poll.question }}</h2>
+    <p>Total Votes: {{ total_votes }}</p>
+
+    <ul>
+        {% for item in data %}
+            <li>{{ item.text }} - {{ item.count }} votes ({{ item.percentage }}%)</li>
+        {% endfor %}
+    </ul>
+   <div class="row">
+    <div class="col"></div>
+    <div class="col">
+        <canvas id="resultsChart" width="400" height="200"></canvas>
+    </div>
+    <div class="col"></div>
+   </div>
+    
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('resultsChart');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: [{% for item in data %}"{{ item.text }}",{% endfor %}],
+            datasets: [{
+                data: [{% for item in data %}{{ item.count }},{% endfor %}],
+                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56', '#66BB6A', '#9575CD']
+            }]
+        }
+    });
+</script>
+{% endblock %}

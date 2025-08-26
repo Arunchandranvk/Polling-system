@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+  <h2>Available Polls</h2>
+  <ul class="list-group">
+    {% for poll in polls %}
+      <li class="list-group-item d-flex justify-content-between align-items-center">
+        {{ poll.question }}
+        {% if poll.is_active %}
+            <span class="badge bg-success ms-2">Active</span>
+          {% else %}
+            <span class="badge bg-danger ms-2">Inactive</span>
+          {% endif %}
+        <a href="{% url 'vote_poll' poll.id %}" class="btn btn-sm btn-primary">Vote</a>
+      </li>
+    {% empty %}
+      <li class="list-group-item">No polls available.</li>
+    {% endfor %}
+  </ul>
+
+  <hr>
+
+  <h2>My Votes</h2>
+  <ul class="list-group">
+    {% for vote in my_votes %}
+      <li class="list-group-item">
+        <strong>
+            
+            
+            {{ vote.poll.question }}
+
+            {% if vote.poll.is_active %}
+          <span class="badge bg-success ms-2">Active</span>
+        {% else %}
+          <span class="badge bg-danger ms-2">Expired</span>
+        {% endif %}
+        </strong><br>
+        
+        You voted: <span class="badge bg-success">{{ vote.option.text }}</span>
+      </li>
+    {% empty %}
+      <li class="list-group-item">You haven't voted in any polls yet.</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endblock %}

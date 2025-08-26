@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poll System - Register</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            color: #333;
+        }
+
+        .auth-container {
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e1e5e9;
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .auth-header {
+            background: #fff;
+            padding: 30px 40px 20px 40px;
+            text-align: center;
+            border-bottom: 1px solid #e1e5e9;
+        }
+
+        .auth-header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: #6c757d;
+            font-size: 0.95rem;
+        }
+
+        .form-container {
+            padding: 30px 40px 40px 40px;
+        }
+
+        .nav-links {
+            text-align: center;
+            margin-bottom: 25px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 4px;
+            border-left: 3px solid #28a745;
+        }
+
+        .nav-links p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+
+        .nav-links a {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-links a:hover {
+            color: #1e7e34;
+            text-decoration: underline;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #495057;
+            font-size: 0.9rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            background: #fff;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #28a745;
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.25);
+        }
+
+        .form-control.error {
+            border-color: #dc3545;
+        }
+
+        .form-control.error:focus {
+            border-color: #dc3545;
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+        }
+
+        .form-control.success {
+            border-color: #28a745;
+        }
+
+        .form-control.warning {
+            border-color: #ffc107;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.15s ease-in-out;
+            margin-top: 10px;
+        }
+
+        .submit-btn:hover {
+            background: #218838;
+        }
+
+        .submit-btn:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(40, 167, 69, 0.5);
+        }
+
+        .submit-btn:active {
+            background: #1e7e34;
+        }
+
+        /* Django Messages Styling */
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            border: 1px solid transparent;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-color: #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-color: #bee5eb;
+        }
+
+        /* Django Form Error Styling */
+        .errorlist {
+            list-style: none;
+            margin: 5px 0 10px 0;
+            padding: 0;
+        }
+
+        .errorlist li {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 3px;
+            font-size: 0.875rem;
+            border: 1px solid #f5c6cb;
+        }
+
+        .helptext {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 4px;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .password-requirements {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            padding: 12px;
+            border-radius: 4px;
+            margin-top: 15px;
+            margin-bottom: 20px;
+        }
+
+        .password-requirements h4 {
+            color: #004085;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .password-requirements ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .password-requirements li {
+            font-size: 0.825rem;
+            color: #495057;
+            margin-bottom: 2px;
+            line-height: 1.4;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .validation-feedback {
+            font-size: 0.8rem;
+            margin-top: 4px;
+        }
+
+        .validation-feedback.success {
+            color: #28a745;
+        }
+
+        .validation-feedback.error {
+            color: #dc3545;
+        }
+
+        .validation-feedback.warning {
+            color: #856404;
+        }
+
+        /* Loading state */
+        .submit-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 480px) {
+            .auth-container {
+                margin: 10px;
+                border-radius: 6px;
+            }
+            
+            .form-container, .auth-header {
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-header">
+            <h1>Poll System</h1>
+            <p>Create your account</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="nav-links">
+                <p>Already have an account? <a href="{% url 'login' %}">Sign in here</a></p>
+            </div>
+
+            <!-- Django Messages -->
+            {% if messages %}
+                <div class="messages">
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- Registration Form -->
+            <form method="post">
+                {% csrf_token %}
+                
+                <!-- Username Field -->
+                <div class="form-group">
+                    <label for="{{ form.username.id_for_label }}">
+                        {{ form.username.label }}
+                        {% if form.username.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    {{ form.username }}
+                    {% if form.username.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.username.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <div class="validation-feedback" id="username-feedback"></div>
+                    {% if form.username.help_text %}
+                        <div class="helptext">{{ form.username.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Email Field -->
+                <div class="form-group">
+                    <label for="{{ form.email.id_for_label }}">
+                        {{ form.email.label }}
+                        {% if form.email.field.required %}<span class="required">*</span>{% endif %}
+                    </label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                        <ul class="errorlist">
+                            {% for error in form.email.errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    <div class="validation-feedback" id="email-feedback"></div>
+                    {% if form.email.help_text %}
+                        <div class="helptext">{{ form.email.help_text }}</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Password Fields Row -->
+                <div class="form-row">
+                    <!-- Password Field -->
+                    <div class="form-group">
+                        <label for="{{ form.password.id_for_label }}">
+                            {{ form.password.label }}
+                            {% if form.password.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+                        {{ form.password }}
+                        {% if form.password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        {% if form.password.help_text %}
+                            <div class="helptext">{{ form.password.help_text }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Confirm Password Field -->
+                    <div class="form-group">
+                        <label for="{{ form.confirm_password.id_for_label }}">
+                            {{ form.confirm_password.label }}
+                            {% if form.confirm_password.field.required %}<span class="required">*</span>{% endif %}
+                        </label>
+                        {{ form.confirm_password }}
+                        {% if form.confirm_password.errors %}
+                            <ul class="errorlist">
+                                {% for error in form.confirm_password.errors %}
+                                    <li>{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                        <div class="validation-feedback" id="confirm-password-feedback"></div>
+                        {% if form.confirm_password.help_text %}
+                            <div class="helptext">{{ form.confirm_password.help_text }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Password Requirements Info -->
+                <div class="password-requirements">
+                    <h4>Password Requirements</h4>
+                    <ul>
+                        <li>At least 8 characters in length</li>
+                        <li>Cannot be too similar to your personal information</li>
+                        <li>Cannot be a commonly used password</li>
+                        <li>Cannot be entirely numeric</li>
+                    </ul>
+                </div>
+                
+                <!-- Non-field errors -->
+                {% if form.non_field_errors %}
+                    <ul class="errorlist">
+                        {% for error in form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+                
+                <button type="submit" class="submit-btn">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Add Django form widget classes and validation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add form-control class to all form inputs
+            const inputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="password"], textarea, select');
+            inputs.forEach(input => {
+                input.classList.add('form-control');
+                
+                // Add error class if field has errors
+                const errorList = input.parentNode.querySelector('.errorlist');
+                if (errorList) {
+                    input.classList.add('error');
+                }
+                
+                // Add required indicator
+                if (input.hasAttribute('required')) {
+                    const label = input.parentNode.querySelector('label');
+                    if (label && !label.querySelector('.required')) {
+                        label.innerHTML += ' <span class="required">*</span>';
+                    }
+                }
+            });
+
+            // Get form elements
+            const usernameField = document.querySelector('input[name="username"]');
+            const emailField = document.querySelector('input[name="email"]');
+            const passwordField = document.querySelector('input[name="password"]');
+            const confirmPasswordField = document.querySelector('input[name="confirm_password"]');
+            
+            const usernameFeedback = document.getElementById('username-feedback');
+            const emailFeedback = document.getElementById('email-feedback');
+            const confirmPasswordFeedback = document.getElementById('confirm-password-feedback');
+
+            // Username validation
+            if (usernameField && usernameFeedback) {
+                usernameField.addEventListener('input', function() {
+                    const username = this.value.trim();
+                    
+                    if (username.length === 0) {
+                        this.classList.remove('success', 'warning', 'error');
+                        usernameFeedback.textContent = '';
+                        usernameFeedback.className = 'validation-feedback';
+                    } else if (username.length < 3) {
+                        this.classList.remove('success', 'error');
+                        this.classList.add('warning');
+                        usernameFeedback.textContent = 'Username must be at least 3 characters long';
+                        usernameFeedback.className = 'validation-feedback warning';
+                    } else if (username.length >= 3) {
+                        this.classList.remove('warning', 'error');
+                        this.classList.add('success');
+                        usernameFeedback.textContent = 'Username looks good';
+                        usernameFeedback.className = 'validation-feedback success';
+                    }
+                });
+            }
+
+            // Email validation
+            if (emailField && emailFeedback) {
+                emailField.addEventListener('input', function() {
+                    const email = this.value.trim();
+                    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                    
+                    if (email.length === 0) {
+                        this.classList.remove('success', 'error');
+                        emailFeedback.textContent = '';
+                        emailFeedback.className = 'validation-feedback';
+                    } else if (!emailRegex.test(email)) {
+                        this.classList.remove('success');
+                        this.classList.add('error');
+                        emailFeedback.textContent = 'Please enter a valid email address';
+                        emailFeedback.className = 'validation-feedback error';
+                    } else {
+                        this.classList.remove('error');
+                        this.classList.add('success');
+                        emailFeedback.textContent = 'Email format is valid';
+                        emailFeedback.className = 'validation-feedback success';
+                    }
+                });
+            }
+
+            // Password confirmation validation
+            if (passwordField && confirmPasswordField && confirmPasswordFeedback) {
+                confirmPasswordField.addEventListener('input', function() {
+                    const password = passwordField.value;
+                    const confirmPassword = this.value;
+                    
+                    if (confirmPassword.length === 0) {
+                        this.classList.remove('success', 'error');
+                        confirmPasswordFeedback.textContent = '';
+                        confirmPasswordFeedback.className = 'validation-feedback';
+                    } else if (password !== confirmPassword) {
+                        this.classList.remove('success');
+                        this.classList.add('error');
+                        confirmPasswordFeedback.textContent = 'Passwords do not match';
+                        confirmPasswordFeedback.className = 'validation-feedback error';
+                    } else {
+                        this.classList.remove('error');
+                        this.classList.add('success');
+                        confirmPasswordFeedback.textContent = 'Passwords match';
+                        confirmPasswordFeedback.className = 'validation-feedback success';
+                    }
+                });
+
+                // Also validate when password field changes
+                passwordField.addEventListener('input', function() {
+                    if (confirmPasswordField.value.length > 0) {
+                        confirmPasswordField.dispatchEvent(new Event('input'));
+                    }
+                });
+            }
+
+            // Auto-hide messages after 5 seconds
+            const messages = document.querySelectorAll('.alert');
+            messages.forEach(message => {
+                setTimeout(() => {
+                    message.style.transition = 'opacity 0.3s ease';
+                    message.style.opacity = '0';
+                    setTimeout(() => {
+                        message.remove();
+                    }, 300);
+                }, 5000);
+            });
+
+            // Form submission loading state
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('.submit-btn');
+            
+            form.addEventListener('submit', function() {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Creating Account...';
+                
+                // Re-enable if form submission fails (e.g., validation errors)
+                setTimeout(() => {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Create Account';
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

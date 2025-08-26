@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Add Poll{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="mb-4">Create a New Poll</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="POST" action="">
+        {% csrf_token %}
+
+        <!-- Question -->
+        <div class="mb-3">
+            <label for="question" class="form-label">Poll Question</label>
+            <input type="text" class="form-control" id="question" name="question" placeholder="Enter your poll question" required>
+        </div>
+
+        <!-- Expiry Date -->
+        <div class="mb-3">
+            <label for="expiry_date" class="form-label">Expiry Date</label>
+            <input type="datetime-local" class="form-control" id="expiry_date" name="expiry_date" required>
+        </div>
+
+        <!-- Options -->
+        <div class="mb-3" id="options-container">
+            <label class="form-label">Options</label>
+            <div class="input-group mb-2">
+                <input type="text" name="options" class="form-control" placeholder="Enter option" required>
+                <button type="button" class="btn btn-danger remove-option">Remove</button>
+            </div>
+        </div>
+        <button type="button" id="add-option" class="btn btn-secondary mb-3">+ Add Option</button>
+            <button type="submit" class="btn btn-success mb-3">Create Poll</button>
+
+      
+    </form>
+</div>
+
+<!-- Add/Remove Options JS -->
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const optionsContainer = document.getElementById("options-container");
+    const addOptionBtn = document.getElementById("add-option");
+
+    addOptionBtn.addEventListener("click", function () {
+        const optionDiv = document.createElement("div");
+        optionDiv.classList.add("input-group", "mb-2");
+        optionDiv.innerHTML = `
+            <input type="text" name="options" class="form-control" placeholder="Enter option" required>
+            <button type="button" class="btn btn-danger remove-option">Remove</button>
+        `;
+        optionsContainer.appendChild(optionDiv);
+    });
+
+    optionsContainer.addEventListener("click", function (e) {
+        if (e.target.classList.contains("remove-option")) {
+            e.target.parentElement.remove();
+        }
+    });
+});
+</script>
+{% endblock %}

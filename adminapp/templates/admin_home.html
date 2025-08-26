@@ -1,0 +1,481 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard - Polls Admin{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Welcome Message -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="hero-card text-center">
+            <div class="hero-content">
+                <i class="bi bi-speedometer2 hero-icon"></i>
+                <h1 class="hero-title">Welcome to Admin Dashboard</h1>
+                <p class="hero-subtitle">Manage your polls and track engagement with powerful tools</p>
+                <div class="hero-stats">
+                    <span class="stat-badge">
+                        <i class="bi bi-clipboard-data me-1"></i>
+                        Complete Control
+                    </span>
+                    <span class="stat-badge">
+                        <i class="bi bi-graph-up me-1"></i>
+                        Real-time Analytics
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Overview Row -->
+<div class="row mb-5">
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stats-card stats-primary">
+            <div class="stats-icon">
+                <i class="bi bi-clipboard-check"></i>
+            </div>
+            <div class="stats-number">{{ total_polls|default:"12" }}</div>
+            <div class="stats-label">Total Polls</div>
+            <div class="stats-trend">
+                <i class="bi bi-arrow-up"></i> +15%
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stats-card stats-success">
+            <div class="stats-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="stats-number">{{ total_votes|default:"2.4k" }}</div>
+            <div class="stats-label">Total Votes</div>
+            <div class="stats-trend">
+                <i class="bi bi-arrow-up"></i> +23%
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stats-card stats-warning">
+            <div class="stats-icon">
+                <i class="bi bi-clock-history"></i>
+            </div>
+            <div class="stats-number">{{ active_polls|default:"8" }}</div>
+            <div class="stats-label">Active Polls</div>
+            <div class="stats-trend">
+                <i class="bi bi-dash"></i> Stable
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 col-sm-6 mb-4">
+        <div class="stats-card stats-info">
+            <div class="stats-icon">
+                <i class="bi bi-trophy"></i>
+            </div>
+            <div class="stats-number">{{ engagement_rate|default:"87" }}%</div>
+            <div class="stats-label">Engagement</div>
+            <div class="stats-trend">
+                <i class="bi bi-arrow-up"></i> +8%
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <div class="card action-card">
+            <div class="card-header d-flex align-items-center">
+                <i class="bi bi-lightning-charge me-2"></i>
+                <span>Quick Actions</span>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="action-item">
+                            <div class="action-icon action-primary">
+                                <i class="bi bi-plus-circle"></i>
+                            </div>
+                            <div class="action-content">
+                                <h5>Create New Poll</h5>
+                                <p>Design and launch a new poll to gather valuable insights from your audience.</p>
+                                <a href="{% url 'poll_add' %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-plus me-1"></i>Add Poll
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6 col-md-12 mb-4">
+                        <div class="action-item">
+                            <div class="action-icon action-info">
+                                <i class="bi bi-list-ul"></i>
+                            </div>
+                            <div class="action-content">
+                                <h5>View Polls Overview</h5>
+                                <p>Monitor all your polls, their status, and performance metrics in one place.</p>
+                                <a href="{% url 'all_polls_results' %}" class="btn btn-info btn-sm">
+                                    <i class="bi bi-eye me-1"></i>View Overview
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Additional Management Options -->
+<div class="row">
+    <div class="col  mb-4">
+        <div class="card feature-card h-100">
+            <div class="card-body text-center">
+                <div class="feature-icon feature-primary">
+                    <i class="bi bi-bar-chart-line"></i>
+                </div>
+                <h5 class="card-title">Analytics & Reports</h5>
+                <p class="card-text">Get detailed insights into poll performance, user engagement, and voting patterns.</p>
+                <a href="{% url 'all_polls_results' %}" class="btn btn-outline-primary">
+                    View Analytics
+                </a>
+            </div>
+        </div>
+    </div>
+    
+ 
+</div>
+
+
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Hero Section */
+.hero-card {
+    background: var(--primary-gradient);
+    border-radius: 20px;
+    padding: 60px 40px;
+    color: white;
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+}
+
+.hero-card::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    animation: heroFloat 6s ease-in-out infinite;
+}
+
+@keyframes heroFloat {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+.hero-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.hero-stats {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat-badge {
+    background: rgba(255,255,255,0.2);
+    padding: 8px 16px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+/* Enhanced Stats Cards */
+.stats-card {
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    border-radius: 16px;
+    padding: 30px 20px;
+    transition: var(--transition);
+    border: none;
+    color: white;
+}
+
+.stats-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.stats-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.stats-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #f39c12 100%);
+}
+
+.stats-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #3498db 100%);
+}
+
+.stats-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.stats-icon {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+    opacity: 0.8;
+}
+
+.stats-number {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.stats-label {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+    margin-bottom: 10px;
+}
+
+.stats-trend {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: 500;
+}
+
+/* Action Cards */
+.action-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 12px;
+    transition: var(--transition);
+}
+
+.action-item:hover {
+    background: rgba(255,255,255,0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+.action-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.action-primary {
+    background: var(--primary-gradient);
+    color: white;
+}
+
+.action-info {
+    background: linear-gradient(135deg, #17a2b8 0%, #3498db 100%);
+    color: white;
+}
+
+.action-content h5 {
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #2c3e50;
+}
+
+.action-content p {
+    margin-bottom: 15px;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+/* Feature Cards */
+.feature-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+    overflow: hidden;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    margin: 0 auto 20px auto;
+}
+
+.feature-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.feature-success {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+}
+
+.feature-warning {
+    background: linear-gradient(135deg, #ffc107 0%, #f39c12 100%);
+    color: white;
+}
+
+.feature-card .card-title {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.feature-card .card-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+}
+
+/* Activity Timeline */
+.activity-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+}
+
+.activity-timeline {
+    position: relative;
+}
+
+.activity-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px 0;
+    position: relative;
+}
+
+.activity-item:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 7px;
+    top: 35px;
+    bottom: -15px;
+    width: 2px;
+    background: #e9ecef;
+}
+
+.activity-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-right: 20px;
+    margin-top: 6px;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 3px rgba(255,255,255,1), 0 0 0 4px #e9ecef;
+}
+
+.activity-content strong {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2rem;
+    }
+    
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+    
+    .hero-card {
+        padding: 40px 20px;
+    }
+    
+    .stats-number {
+        font-size: 2rem;
+    }
+    
+    .action-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .action-icon {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+    
+    .hero-stats {
+        flex-direction: column;
+        align-items: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .hero-stats {
+        gap: 10px;
+    }
+    
+    .stat-badge {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+}
+</style>
+{% endblock %}

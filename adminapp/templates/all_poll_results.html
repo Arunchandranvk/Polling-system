@@ -1,0 +1,906 @@
+{% extends "base.html" %}
+{% block title %}Poll Results - {{ poll.question|default:"All Polls Results" }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="page-header">
+            <div class="d-flex justify-content-between align-items-center flex-wrap">
+                <div>
+                    <h1 class="page-title">
+                        <i class="bi bi-bar-chart-line me-2"></i>
+                        {% if poll %}
+                            Poll Results
+                        {% else %}
+                            All Polls Results
+                        {% endif %}
+                    </h1>
+                    {% if poll %}
+                        <p class="page-subtitle">{{ poll.question }}</p>
+                    {% else %}
+                        <p class="page-subtitle">Comprehensive overview of all poll results and analytics</p>
+                    {% endif %}
+                </div>
+                
+                <div class="page-actions">
+                    <a href="{% url 'export_polls_results_csv' %}" class="btn btn-success">
+                        <i class="bi bi-download me-1"></i>Export CSV
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Single Poll Results (if displaying one poll) -->
+{% if poll %}
+<div class="row">
+    <!-- Results Summary Card -->
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card summary-card">
+            <div class="card-body text-center">
+                <div class="summary-icon">
+                    <i class="bi bi-people-fill"></i>
+                </div>
+                <h3 class="summary-number">{{ total_votes }}</h3>
+                <p class="summary-label">Total Votes</p>
+                <div class="summary-progress">
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: 100%"></div>
+                    </div>
+                    <small class="text-muted mt-1">Participation Rate: 100%</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Results Card -->
+    <div class="col-lg-8 col-md-6 mb-4">
+        <div class="card results-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ol me-2"></i>Detailed Results
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="results-list">
+                    {% for item in data %}
+                    <div class="result-item" data-votes="{{ item.count }}" data-percentage="{{ item.percentage }}">
+                        <div class="result-info">
+                            <div class="result-text">{{ item.text }}</div>
+                            <div class="result-stats">
+                                <span class="vote-count">{{ item.count }} votes</span>
+                                <span class="vote-percentage">{{ item.percentage }}%</span>
+                            </div>
+                        </div>
+                        <div class="result-bar">
+                            <div class="progress-bar-custom" style="width: {{ item.percentage }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Section -->
+    <div class="col-12 mb-4">
+        <div class="card chart-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="bi bi-graph-up me-2"></i>Visual Analysis
+                </h5>
+                <div class="chart-controls">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <input type="radio" class="btn-check" name="chartType" id="pieChart" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="pieChart">
+                            <i class="bi bi-pie-chart me-1"></i>Pie
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="chartType" id="barChart" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="barChart">
+                            <i class="bi bi-bar-chart me-1"></i>Bar
+                        </label>
+                        
+                        <input type="radio" class="btn-check" name="chartType" id="doughnutChart" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="doughnutChart">
+                            <i class="bi bi-circle me-1"></i>Doughnut
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="chart-container">
+                    <canvas id="resultsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% else %}
+<!-- Multiple Polls Results -->
+<div class="row">
+    {% for poll_data in polls_data %}
+    <div class="col-12 mb-5">
+        <div class="card poll-results-card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h5 class="mb-1">{{ poll_data.poll.question }} - {% if poll_data.poll.is_active %}
+                        <span class="badge bg-success ms-2">Active</span>
+                        {% else %}
+                        <span class="badge bg-danger ms-2">Expired</span>
+                        {% endif %}</h5>
+                        <small class="text-light opacity-75">
+                            Created: {{ poll_data.poll.created_at|date:"M d, Y" }}
+                            {% if poll_data.poll.pub_date %}
+                            | Published: {{ poll_data.poll.pub_date|date:"M d, Y" }}
+                            {% endif %}
+                        </small>
+                    </div>
+                    <div class="poll-stats-badge">
+                        <i class="bi bi-people me-1"></i>{{ poll_data.total_votes }} votes
+                    </div>
+                </div>
+            </div>
+            <div class="card-body" style="background-color:white;">
+                <div class="row" style="padding:10px 200px;">
+                    <!-- Results List -->
+                    <div class="col mb-3">
+                        <div class="results-section">
+                            <h6 class="section-title">
+                                <i class="bi bi-list-ul me-2"></i>Results Breakdown
+                            </h6>
+                            <div class="results-list-compact">
+                                {% for option in poll_data.options %}
+                                <div class="result-item-compact">
+                                    <div class="result-info-compact">
+                                        <span class="result-text-compact">{{ option.text }}</span>
+                                        <span class="result-stats-compact">
+                                            {{ option.count }} ({{ option.percentage }}%)
+                                        </span>
+                                    </div>
+                                    <div class="result-bar-compact">
+                                        <div class="progress-bar-compact" style="width: {{ option.percentage }}%"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="poll-actions mt-3">
+                    <a href="{% url 'poll_results' poll_data.poll.id %}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i>View Details
+                    </a>
+                   
+                    <button class="btn btn-sm btn-outline-info" onclick="sharePoll({{ poll_data.poll.id }})">
+                        <i class="bi bi-share me-1"></i>Share
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="empty-state">
+            <div class="empty-icon">
+                <i class="bi bi-clipboard-x"></i>
+            </div>
+            <h3>No Polls Found</h3>
+            <p>There are no polls to display results for at the moment.</p>
+            <a href="{% url 'poll_add' %}" class="btn btn-primary">
+                <i class="bi bi-plus me-1"></i>Create Your First Poll
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Page Header */
+.page-header {
+    background: var(--primary-gradient);
+    border-radius: 16px;
+    padding: 30px;
+    color: white;
+    margin-bottom: 30px;
+    box-shadow: var(--card-shadow);
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin-bottom: 0;
+    max-width: 80%;
+}
+
+.page-actions .btn {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+/* Summary Card */
+.summary-card {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.summary-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+.summary-icon {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    opacity: 0.9;
+}
+
+.summary-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.summary-label {
+    font-size: 1.1rem;
+    margin-bottom: 20px;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.summary-progress .progress {
+    height: 8px;
+    background: rgba(230, 225, 225, 0.21);
+    border-radius: 4px;
+}
+
+/* Results Card */
+.results-card, .chart-card, .poll-results-card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: var(--transition);
+}
+
+.results-card:hover, .chart-card:hover, .poll-results-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--card-hover-shadow);
+}
+
+/* Result Items */
+.result-item {
+    display: flex;
+    align-items: center;
+    padding: 20px 0;
+    border-bottom: 1px solid #f8f9fa;
+    transition: var(--transition);
+}
+
+.result-item:last-child {
+    border-bottom: none;
+}
+
+.result-item:hover {
+    background: rgba(0,123,255,0.05);
+    border-radius: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.result-info {
+    flex: 1;
+    margin-right: 20px;
+}
+
+.result-text {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+    margin-bottom: 5px;
+}
+
+.result-stats {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.vote-count {
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.vote-percentage {
+    background: var(--primary-gradient);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.result-bar {
+    width: 100px;
+    height: 8px;
+    background: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-bar-custom {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+    animation: barGrow 2s ease-out;
+}
+
+@keyframes barGrow {
+    from { width: 0; }
+}
+
+/* Chart Container */
+.chart-container {
+    position: relative;
+    height: 400px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.chart-controls .btn-group .btn {
+    font-size: 0.875rem;
+    padding: 6px 12px;
+}
+
+/* Compact Results for Multiple Polls */
+.results-section, .chart-section {
+    height: 100%;
+}
+
+.section-title {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.results-list-compact {
+    space-y: 10px;
+}
+
+.result-item-compact {
+    padding: 12px 0;
+    border-bottom: 1px solid #f1f3f4;
+    transition: var(--transition);
+}
+
+.result-item-compact:last-child {
+    border-bottom: none;
+}
+
+.result-item-compact:hover {
+    background: rgba(0,123,255,0.03);
+    border-radius: 6px;
+    padding-left: 8px;
+    padding-right: 8px;
+}
+
+.result-info-compact {
+    display: flex;
+    justify-content: between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.result-text-compact {
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.95rem;
+}
+
+.result-stats-compact {
+    color: #6c757d;
+    font-size: 0.85rem;
+    font-weight: 500;
+    margin-left: auto;
+}
+
+.result-bar-compact {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar-compact {
+    height: 100%;
+    background: var(--primary-gradient);
+    border-radius: 3px;
+    transition: width 1.5s ease-in-out;
+}
+
+/* Mini Charts */
+.mini-chart-container {
+    position: relative;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mini-chart {
+    max-height: 180px;
+}
+
+/* Poll Stats Badge */
+.poll-stats-badge {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    backdrop-filter: blur(10px);
+}
+
+/* Poll Actions */
+.poll-actions {
+    border-top: 1px solid #f1f3f4;
+    padding-top: 15px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 80px 20px;
+    color: #6c757d;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.5;
+}
+
+.empty-state h3 {
+    margin-bottom: 15px;
+    color: #495057;
+}
+
+.empty-state p {
+    margin-bottom: 30px;
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 20px;
+    }
+    
+    .page-title {
+        font-size: 1.8rem;
+    }
+    
+    .page-subtitle {
+        max-width: 100%;
+    }
+    
+    .page-actions {
+        margin-top: 15px;
+    }
+    
+    .result-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .result-info {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    
+    .result-bar {
+        width: 100%;
+    }
+    
+    .chart-container {
+        height: 300px;
+    }
+    
+    .poll-actions {
+        flex-direction: column;
+    }
+    
+    .poll-actions .btn {
+        text-align: left;
+    }
+}
+
+@media (max-width: 576px) {
+    .summary-number {
+        font-size: 2.5rem;
+    }
+    
+    .result-stats {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+    
+    .chart-controls .btn-group {
+        flex-direction: column;
+        width: 100%;
+    }
+}
+
+/* Animation delays for staggered loading */
+.result-item:nth-child(1) .progress-bar-custom,
+.result-item-compact:nth-child(1) .progress-bar-compact {
+    animation-delay: 0.2s;
+}
+
+.result-item:nth-child(2) .progress-bar-custom,
+.result-item-compact:nth-child(2) .progress-bar-compact {
+    animation-delay: 0.4s;
+}
+
+.result-item:nth-child(3) .progress-bar-custom,
+.result-item-compact:nth-child(3) .progress-bar-compact {
+    animation-delay: 0.6s;
+}
+
+.result-item:nth-child(4) .progress-bar-custom,
+.result-item-compact:nth-child(4) .progress-bar-compact {
+    animation-delay: 0.8s;
+}
+
+.result-item:nth-child(5) .progress-bar-custom,
+.result-item-compact:nth-child(5) .progress-bar-compact {
+    animation-delay: 1s;
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    {% if poll %}
+    // Single Poll Chart
+    initializeSinglePollChart();
+    {% else %}
+    // Multiple Polls Charts
+    initializeMultiplePollCharts();
+    {% endif %}
+    
+    // Add loading animation to progress bars
+    setTimeout(() => {
+        document.querySelectorAll('.progress-bar-custom, .progress-bar-compact').forEach(bar => {
+            bar.style.opacity = '1';
+        });
+    }, 500);
+});
+
+{% if poll %}
+let currentChart;
+const chartColors = [
+    'rgba(102, 126, 234, 0.8)',
+    'rgba(118, 75, 162, 0.8)', 
+    'rgba(255, 99, 132, 0.8)',
+    'rgba(54, 162, 235, 0.8)',
+    'rgba(255, 206, 86, 0.8)',
+    'rgba(75, 192, 192, 0.8)',
+    'rgba(153, 102, 255, 0.8)',
+    'rgba(255, 159, 64, 0.8)'
+];
+
+const chartBorderColors = [
+    'rgba(102, 126, 234, 1)',
+    'rgba(118, 75, 162, 1)', 
+    'rgba(255, 99, 132, 1)',
+    'rgba(54, 162, 235, 1)',
+    'rgba(255, 206, 86, 1)',
+    'rgba(75, 192, 192, 1)',
+    'rgba(153, 102, 255, 1)',
+    'rgba(255, 159, 64, 1)'
+];
+
+function initializeSinglePollChart() {
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    
+    const labels = [{% for item in data %}"{{ item.text|escapejs }}",{% endfor %}];
+    const data = [{% for item in data %}{{ item.count }},{% endfor %}];
+    
+    currentChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: chartColors,
+                borderColor: chartBorderColors,
+                borderWidth: 2,
+                hoverOffset: 10
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        font: {
+                            size: 12,
+                            weight: '500'
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    cornerRadius: 8,
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return ` ${context.label}: ${context.raw} votes (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateRotate: true,
+                animateScale: true,
+                duration: 1500,
+                easing: 'easeOutCubic'
+            }
+        }
+    });
+    
+    // Chart type switcher
+    document.querySelectorAll('input[name="chartType"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            switchChartType(this.id);
+        });
+    });
+}
+
+function switchChartType(chartType) {
+    if (!currentChart) return;
+    
+    const labels = [{% for item in data %}"{{ item.text|escapejs }}",{% endfor %}];
+    const data = [{% for item in data %}{{ item.count }},{% endfor %}];
+    
+    currentChart.destroy();
+    
+    const ctx = document.getElementById('resultsChart').getContext('2d');
+    let newType = 'pie';
+    let newOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    font: { size: 12, weight: '500' }
+                }
+            },
+            tooltip: {
+                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                titleColor: '#fff',
+                bodyColor: '#fff',
+                borderColor: 'rgba(255, 255, 255, 0.1)',
+                borderWidth: 1,
+                cornerRadius: 8
+            }
+        },
+        animation: {
+            duration: 1500,
+            easing: 'easeOutCubic'
+        }
+    };
+    
+    if (chartType === 'barChart') {
+        newType = 'bar';
+        newOptions.scales = {
+            y: {
+                beginAtZero: true,
+                grid: {
+                    color: 'rgba(0, 0, 0, 0.1)'
+                },
+                ticks: {
+                    font: { weight: '500' }
+                }
+            },
+            x: {
+                grid: {
+                    display: false
+                },
+                ticks: {
+                    font: { weight: '500' }
+                }
+            }
+        };
+        newOptions.plugins.legend.display = false;
+    } else if (chartType === 'doughnutChart') {
+        newType = 'doughnut';
+        newOptions.cutout = '60%';
+    }
+    
+    currentChart = new Chart(ctx, {
+        type: newType,
+        data: {
+            labels: labels,
+            datasets: [{
+                data: data,
+                backgroundColor: chartColors,
+                borderColor: chartBorderColors,
+                borderWidth: 2,
+                hoverOffset: 10
+            }]
+        },
+        options: newOptions
+    });
+}
+
+function toggleChartType() {
+    const currentType = document.querySelector('input[name="chartType"]:checked').id;
+    const types = ['pieChart', 'barChart', 'doughnutChart'];
+    const currentIndex = types.indexOf(currentType);
+    const nextIndex = (currentIndex + 1) % types.length;
+    const nextType = types[nextIndex];
+    
+    document.getElementById(nextType).checked = true;
+    switchChartType(nextType);
+}
+
+{% else %}
+function initializeMultiplePollCharts() {
+    const pollsData = [
+        {% for poll_data in polls_data %}
+        {
+            id: {{ poll_data.poll.id }},
+            labels: [{% for option in poll_data.options %}"{{ option.text|escapejs }}",{% endfor %}],
+            data: [{% for option in poll_data.options %}{{ option.count }},{% endfor %}],
+            total: {{ poll_data.total_votes }}
+        },
+        {% endfor %}
+    ];
+    
+    pollsData.forEach((poll, index) => {
+        const ctx = document.getElementById(`chart-${poll.id}`).getContext('2d');
+        
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: poll.labels,
+                datasets: [{
+                    data: poll.data,
+                    backgroundColor: chartColors,
+                    borderColor: chartBorderColors,
+                    borderWidth: 2,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '60%',
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        cornerRadius: 8,
+                        callbacks: {
+                            label: function(context) {
+                                const percentage = ((context.raw / poll.total) * 100).toFixed(1);
+                                return ` ${context.label}: ${context.raw} votes (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateRotate: true,
+                    duration: 1000 + (index * 200),
+                    easing: 'easeOutCubic'
+                }
+            }
+        });
+    });
+}
+{% endif %}
+
+// Utility Functions
+function exportResults() {
+    showToast('Export functionality will be implemented soon!', 'info');
+}
+
+function sharePoll(pollId) {
+    const url = `${window.location.origin}/polls/${pollId}/`;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: 'Check out this poll!',
+            url: url
+        }).catch(console.error);
+    } else {
+        navigator.clipboard.writeText(url).then(() => {
+            showToast('Poll link copied to clipboard!', 'success');
+        }).catch(() => {
+            showToast('Unable to copy link. Please copy manually: ' + url, 'warning');
+        });
+    }
+}
+
+// Add smooth animations on scroll
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.style.opacity = '1';
+            entry.target.style.transform = 'translateY(0)';
+        }
+    });
+}, observerOptions);
+
+// Apply animation to cards
+document.querySelectorAll('.card').forEach(card => {
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(20px)';
+    card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+    observer.observe(card);
+});
+</script>
+{% endblock %}
